@@ -1,0 +1,1 @@
+del /S *.db *.ipch *.ilk *.pdb *.pch *.idb *.obj
