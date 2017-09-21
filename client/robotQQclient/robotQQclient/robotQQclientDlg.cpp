@@ -64,6 +64,9 @@ BEGIN_MESSAGE_MAP(CrobotQQclientDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+    ON_BN_CLICKED(IDOK, &CrobotQQclientDlg::OnBnClickedOk)
+    ON_BN_CLICKED(ID_START_UPLOAD, &CrobotQQclientDlg::OnBnClickedStartUpload)
+    ON_BN_CLICKED(ID_STOP_UPLOAD, &CrobotQQclientDlg::OnBnClickedStopUpload)
 END_MESSAGE_MAP()
 
 
@@ -152,3 +155,23 @@ HCURSOR CrobotQQclientDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CrobotQQclientDlg::OnBnClickedOk()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CDialogEx::OnOK();
+}
+
+
+void CrobotQQclientDlg::OnBnClickedStartUpload()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+}
+
+
+void CrobotQQclientDlg::OnBnClickedStopUpload()
+{
+    // TODO: 在此添加控件通知处理程序代码
+}
