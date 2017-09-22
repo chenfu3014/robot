@@ -22,8 +22,8 @@
 #define VERSION_INFO   2017-08/22-12:30
 
 
-#include "socketSrv.h"
-#include "saveXML.h"
+#include "netComm.h"
+#include "stroeData.h"
 
 void main()
 {
