@@ -19,39 +19,49 @@
 ** 
 ** --------------------------------------------------------------------------------------------------------------------
 **************************************************************************/
-  
-#ifndef _ROBOT_SRV_H_
-#define _ROBOT_SRV_H_
+
+
+
+#inlcude "stdio.h"
+#include "string.h"
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/msg.h>
+#include <linux/tcp.h>
+#include <netdb.h>
+#include <errno.h>
+#include <net/if.h>
 
 
 
 
 
-/**
- **************************************************************
+
+/****************************************************************
  * @function name      : 
  * @brief              : 
- * @input param        : 
+  * @input param        : 
  * @output param       : 
  * @retval             : 
  * @author             : 
- * @date               : 
+  * @date               : 
  * @others             :
- **************************************************************
-*/
-int create_task_recv_data();
+ ***************************************************************/
+int createTaskStoreData()
+{
+    //
+    int errNum = 0;
+    pthread_t writeXmlId;
+    errNum = pthread_create(&writeXmlId, NULL, thr_fn, NULL);
+    if (errNum != 0)
+    {
+        printf("createTaskSaveXMLToLocal failed: %s\n", strerror(errNum));
+    }
+
+    return ret; 
+}
 
 
-
-
-
-
-
-
-
-
-
-#endif
-
-
-/********************************** (H) *****END OF FILE**************************/
+/********************************** (C) *****END OF FILE**************************/
