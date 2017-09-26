@@ -1,1 +1,0 @@
-rm -rvf *.db *.ipch *.ilk *.pdb *.pch *.idb *.obj

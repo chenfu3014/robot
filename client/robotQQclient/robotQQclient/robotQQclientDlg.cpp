@@ -65,8 +65,8 @@ BEGIN_MESSAGE_MAP(CrobotQQclientDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
     ON_BN_CLICKED(IDOK, &CrobotQQclientDlg::OnBnClickedOk)
-    ON_BN_CLICKED(ID_START_UPLOAD, &CrobotQQclientDlg::OnBnClickedStartUpload)
-    ON_BN_CLICKED(ID_STOP_UPLOAD, &CrobotQQclientDlg::OnBnClickedStopUpload)
+	ON_BN_CLICKED(ID_BTN_START, &CrobotQQclientDlg::OnBnClickedBtnStart)
+	ON_BN_CLICKED(ID_BTN_STOP, &CrobotQQclientDlg::OnBnClickedBtnStop)
 END_MESSAGE_MAP()
 
 
@@ -164,14 +164,14 @@ void CrobotQQclientDlg::OnBnClickedOk()
 }
 
 
-void CrobotQQclientDlg::OnBnClickedStartUpload()
-{
-    // TODO: 在此添加控件通知处理程序代码
 
+void CrobotQQclientDlg::OnBnClickedBtnStart()
+{
+	// TODO: 在此添加控件通知处理程序代码
 }
 
 
-void CrobotQQclientDlg::OnBnClickedStopUpload()
+void CrobotQQclientDlg::OnBnClickedBtnStop()
 {
-    // TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码
 }

@@ -1,0 +1,27 @@
+﻿.translation-popover {
+    background-color: #ffffe1;
+    border: 1px solid #000000;
+    padding-left: 8px;
+    padding-bottom: 7px;
+    padding-right: 8px;
+    padding-top: 7px;
+    position: absolute;
+    z-index: 65535;
+    border-radius: 0;
+    max-width: 468px;
+}
+.translation-hover {
+    background-color: #ffff00;
+}
+.translation-disclaimer {
+    margin-bottom: 13px;
+}
+.translation-disclaimer-table {
+    background-color: #ffffe1;
+    width: 100%;
+    border: 1px solid #bbbbbb;
+    font-size: 0.923em;
+}
+.sxs-lookup {
+    display: none;
+}

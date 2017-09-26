@@ -1,6 +1,3 @@
-﻿  stdafx.cpp
-  robotQQclientDlg.cpp
-  robotQQclient.cpp
-  正在生成代码...
-  robotQQclient.vcxproj -> E:\code\robot\client\robotQQclient\Debug\robotQQclient.exe
-  robotQQclient.vcxproj -> E:\code\robot\client\robotQQclient\Debug\robotQQclient.pdb (Partial PDB)
+﻿  dataFile.cpp
+  robotQQclient.vcxproj -> D:\work\code\robot\client\robotQQclient\Debug\robotQQclient.exe
+  robotQQclient.vcxproj -> D:\work\code\robot\client\robotQQclient\Debug\robotQQclient.pdb (Partial PDB)
