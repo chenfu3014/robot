@@ -6,13 +6,44 @@
 #include "robotQQclient.h"
 #include "robotQQclientDlg.h"
 #include "afxdialogex.h"
-#include "MyFile.h"
 
 
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+
+bool gFlagCheckFileSize = FLAGE_STOP_THREAD_PROC;
+bool gOnOffSound = 0;
+
+
+
+DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
+{
+    while (1)
+    {
+        if (FLAGE_STOP_THREAD_PROC == gFlagCheckFileSize)
+        {
+            Sleep(1);
+            continue;
+        }
+        else
+        {
+            if (gOnOffSound)
+            {   
+                MessageBeep(MB_OK);
+            }
+            
+            // 1: read file 
+            // 2: send file to server.
+            // 3: 
+
+        }
+    }
+    return 0;
+}
+
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
@@ -72,6 +103,7 @@ BEGIN_MESSAGE_MAP(CrobotQQclientDlg, CDialogEx)
 	ON_BN_CLICKED(ID_BTN_STOP, &CrobotQQclientDlg::OnBnClickedBtnStop)
     ON_BN_CLICKED(IDC_BTN_SELECT_FILE, &CrobotQQclientDlg::OnBnClickedBtnSelectFile)
     ON_BN_CLICKED(IDC_BTN_HELP, &CrobotQQclientDlg::OnBnClickedBtnHelp)
+    ON_BN_CLICKED(IDC_BTN_ONOFF_SOUNED, &CrobotQQclientDlg::OnBnClickedBtnOnoffSouned)
 END_MESSAGE_MAP()
 
 
@@ -107,7 +139,12 @@ BOOL CrobotQQclientDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-
+    gOnOffSound = 1;
+    mHandleCheckFile = CreateThread(NULL, 0, ThreadProcCheckFileSize, NULL, 0, NULL);
+    if ( NULL == mHandleCheckFile )
+    {
+        AfxMessageBox( _T("Monitor Log File Failed!!!"));
+    }
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -162,27 +199,12 @@ HCURSOR CrobotQQclientDlg::OnQueryDragIcon()
 
 
 
-DWORD WINAPI ThreadProcCheckFileSize(LPVOID lpParam)
-{
-   while (1)
-   {
-       if (FLAGE_STOP_THREAD_PROC == m_flagCheckFileSize )
-       {
-           Sleep(1);
-           continue;
-       }
-
-       //
-   }
-    return 0;
-}
 
 void CrobotQQclientDlg::OnBnClickedBtnStart()
 {
 	// TODO: 在此添加控件通知处理程序代码
 
-
-    m_flagCheckFileSize = FLAGE_START_THREAD_PROC;
+    gFlagCheckFileSize = FLAGE_START_THREAD_PROC;
 
 }
 
@@ -190,8 +212,12 @@ void CrobotQQclientDlg::OnBnClickedBtnStart()
 void CrobotQQclientDlg::OnBnClickedBtnStop()
 {
 	// TODO: 在此添加控件通知处理程序代码
+<<<<<<< HEAD
+    gFlagCheckFileSize = FLAGE_STOP_THREAD_PROC;
+=======
     m_flagCheckFileSize = FLAGE_STOP_THREAD_PROC;
 	//
+>>>>>>> f798954d5911e635df81a4481fbe1dd215e6eab6
 }
 
 
@@ -217,7 +243,23 @@ void CrobotQQclientDlg::OnBnClickedBtnHelp()
     // TODO: 在此添加控件通知处理程序代码
 
     CFile logMsgFile(m_filepathname.GetBuffer(), CFile::modeRead);
-    int fileSize = logMsgFile.GetLength();
+    mCurrentFileSize = logMsgFile.GetLength();
 
-    AfxMessageBox( _T("点了也没啥卵用~~~") );
+    AfxMessageBox( _T("~~~点了也没啥卵用~~~") );
+}
+
+
+
+void CrobotQQclientDlg::OnBnClickedBtnOnoffSouned()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (gOnOffSound == 0)
+    {
+        gOnOffSound = 1;
+    }
+    else
+    {
+        gOnOffSound = 0;
+    }
+
 }

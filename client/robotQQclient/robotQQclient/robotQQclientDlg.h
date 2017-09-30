@@ -52,11 +52,13 @@ private:
 public:
     afx_msg void OnBnClickedBtnHelp();
 
-
 private:
-    int mLastFileSize;
-    int mCurFileSize;
+    unsigned long long mCurrentFileSize;   // 当前的文件大小
+    unsigned long long mLastFileSize;        // 上次的文件大小
 
-    bool m_flagCheckFileSize;
+    HANDLE  mHandleCheckFile;
+    bool mOnOffSound;
 
+public:
+    afx_msg void OnBnClickedBtnOnoffSouned();
 };

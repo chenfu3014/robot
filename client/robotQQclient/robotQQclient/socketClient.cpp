@@ -51,6 +51,8 @@ int socketClient::initSocketForClient( const char  *serverIP, const int serverPo
 
     socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (0 == socketFD)
+
+
     {
         //error
         return -1;
