@@ -51,14 +51,14 @@ private:
     CEdit mEditCtlPath;
 public:
     afx_msg void OnBnClickedBtnHelp();
-
+    void setSysInfoToStatusBar(CString sysInfo);
 private:
-    unsigned long long mCurrentFileSize;   // 当前的文件大小
-    unsigned long long mLastFileSize;        // 上次的文件大小
+
 
     HANDLE  mHandleCheckFile;
     bool mOnOffSound;
 
 public:
     afx_msg void OnBnClickedBtnOnoffSouned();
+    CStatic mCtrlSysInfo;
 };

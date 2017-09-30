@@ -1,4 +1,3 @@
-﻿  socketClient.cpp
-  robotQQclientDlg.cpp
-  正在生成代码...
-LINK : fatal error LNK1168: 无法打开 D:\work\code\robot\client\robotQQclient\Debug\robotQQclient.exe 进行写入
+﻿  LINK : 没有找到 D:\work\code\robot\client\robotQQclient\Debug\robotQQclient.exe 或上一个增量链接没有生成它；正在执行完全链接
+  robotQQclient.vcxproj -> D:\work\code\robot\client\robotQQclient\Debug\robotQQclient.exe
+  robotQQclient.vcxproj -> D:\work\code\robot\client\robotQQclient\Debug\robotQQclient.pdb (Partial PDB)
