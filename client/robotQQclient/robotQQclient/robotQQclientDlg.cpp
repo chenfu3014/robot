@@ -191,6 +191,7 @@ void CrobotQQclientDlg::OnBnClickedBtnStop()
 {
 	// TODO: 在此添加控件通知处理程序代码
     m_flagCheckFileSize = FLAGE_STOP_THREAD_PROC;
+	//
 }
 
 
