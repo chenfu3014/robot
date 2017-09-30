@@ -1,0 +1,18 @@
+2017-09-19 19:23:54 发送队列启动完成
+2017-09-19 19:27:27 拖泥(2353617310) 说：1
+2017-09-19 19:27:26 拖泥(2353617310) 说：123
+2017-09-19 19:27:27 拖泥(2353617310) 说：21
+2017-09-19 19:27:27 拖泥(2353617310) 说：2312
+2017-09-19 19:27:26 拖泥(2353617310) 说：1231231
+2017-09-19 19:27:28 拖泥(2353617310) 说：sd
+2017-09-19 19:27:26 拖泥(2353617310) 说：123
+2017-09-19 19:30:35 拖泥(2353617310) 说：rm -rvf ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs[Face:54]bght/  &&  cp -rvf  ../../../../apps[Face:46]e/common[Face:54]b[Face:54]bght/ ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs/  && make zlibclean && make zlib
+2017-09-19 19:30:36 拖泥(2353617310) 说：rm -rvf ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs[Face:54]bght/  &&  cp -rvf  ../../../../apps[Face:46]e/common[Face:54]b[Face:54]bght/ ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs/  && make zlibclean && make zlib
+2017-09-19 19:30:36 拖泥(2353617310) 说：rm -rvf ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs[Face:54]bght/  &&  cp -rvf  ../../../../apps[Face:46]e/common[Face:54]b[Face:54]bght/ ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs/  && make zlibclean && make zlib
+2017-09-19 19:30:34 拖泥(2353617310) 说：sffsdfs
+2017-09-19 19:30:36 拖泥(2353617310) 说：rm -rvf ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs[Face:54]bght/  &&  cp -rvf  ../../../../apps[Face:46]e/common[Face:54]b[Face:54]bght/ ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs/  && make zlibclean && make zlib
+2017-09-19 19:30:35 拖泥(2353617310) 说：rm -rvf ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs[Face:54]bght/  &&  cp -rvf  ../../../../apps[Face:46]e/common[Face:54]b[Face:54]bght/ ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs/  && make zlibclean && make zlib
+2017-09-19 19:30:37 拖泥(2353617310) 说：
+rm -rvf ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs[Face:54]bght/  &&  cp -rvf  ../../../../apps[Face:46]e/common[Face:54]b[Face:54]bght/ ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs/  && make zlibclean && make zlib
+2017-09-19 19:30:32 拖泥(2353617310) 说：rm -rvf ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs[Face:54]bght/  &&  cp -rvf  ../../../../apps[Face:46]e/common[Face:54]b[Face:54]bght/ ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs/  && make zlibclean && make zlib
+2017-09-19 19:30:35 拖泥(2353617310) 说：rm -rvf ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs[Face:54]bght/  &&  cp -rvf  ../../../../apps[Face:46]e/common[Face:54]b[Face:54]bght/ ../../../..[Face:54]nux_plat/base[Face:54]nux[Face:54]b[Face:46]e_libs/  && make zlibclean && make zlib

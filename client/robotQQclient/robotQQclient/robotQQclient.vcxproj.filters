@@ -36,9 +36,6 @@
     <ClInclude Include="socketClient.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="dataFile.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="robotQQclient.cpp">
@@ -51,9 +48,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="socketClient.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="dataFile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

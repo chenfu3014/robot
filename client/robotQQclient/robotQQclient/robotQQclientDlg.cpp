@@ -6,6 +6,9 @@
 #include "robotQQclient.h"
 #include "robotQQclientDlg.h"
 #include "afxdialogex.h"
+#include "MyFile.h"
+
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -57,16 +60,18 @@ CrobotQQclientDlg::CrobotQQclientDlg(CWnd* pParent /*=NULL*/)
 
 void CrobotQQclientDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_EDIT_FILE_PATH, mEditCtlPath);
 }
 
 BEGIN_MESSAGE_MAP(CrobotQQclientDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-    ON_BN_CLICKED(IDOK, &CrobotQQclientDlg::OnBnClickedOk)
 	ON_BN_CLICKED(ID_BTN_START, &CrobotQQclientDlg::OnBnClickedBtnStart)
 	ON_BN_CLICKED(ID_BTN_STOP, &CrobotQQclientDlg::OnBnClickedBtnStop)
+    ON_BN_CLICKED(IDC_BTN_SELECT_FILE, &CrobotQQclientDlg::OnBnClickedBtnSelectFile)
+    ON_BN_CLICKED(IDC_BTN_HELP, &CrobotQQclientDlg::OnBnClickedBtnHelp)
 END_MESSAGE_MAP()
 
 
@@ -157,21 +162,61 @@ HCURSOR CrobotQQclientDlg::OnQueryDragIcon()
 
 
 
-void CrobotQQclientDlg::OnBnClickedOk()
+DWORD WINAPI ThreadProcCheckFileSize(LPVOID lpParam)
 {
-    // TODO: 在此添加控件通知处理程序代码
-    CDialogEx::OnOK();
+   while (1)
+   {
+       if (FLAGE_STOP_THREAD_PROC == m_flagCheckFileSize )
+       {
+           Sleep(1);
+           continue;
+       }
+
+       //
+   }
+    return 0;
 }
-
-
 
 void CrobotQQclientDlg::OnBnClickedBtnStart()
 {
 	// TODO: 在此添加控件通知处理程序代码
+
+
+    m_flagCheckFileSize = FLAGE_START_THREAD_PROC;
+
 }
 
 
 void CrobotQQclientDlg::OnBnClickedBtnStop()
 {
 	// TODO: 在此添加控件通知处理程序代码
+    m_flagCheckFileSize = FLAGE_STOP_THREAD_PROC;
+}
+
+
+void CrobotQQclientDlg::OnBnClickedBtnSelectFile()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CFileDialog fpdlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, NULL);
+    if (fpdlg.DoModal() == IDOK)
+    {
+        //m_filename = fpdlg.GetFileName();
+        //m_fileext = fpdlg.GetFileExt();//文件扩展名
+        m_filepathname = fpdlg.GetPathName();
+        //UpdateData(FALSE);
+        //m_fileFullPath = m_filepathname + m_filename + "." + m_fileext;
+        //
+        mEditCtlPath.SetWindowTextW(m_filepathname);
+    }
+}
+
+
+void CrobotQQclientDlg::OnBnClickedBtnHelp()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    CFile logMsgFile(m_filepathname.GetBuffer(), CFile::modeRead);
+    int fileSize = logMsgFile.GetLength();
+
+    AfxMessageBox( _T("点了也没啥卵用~~~") );
 }

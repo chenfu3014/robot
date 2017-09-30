@@ -3,6 +3,12 @@
 //
 
 #pragma once
+#include "afxwin.h"
+
+
+
+#define FLAGE_START_THREAD_PROC   1
+#define FLAGE_STOP_THREAD_PROC   0
 
 
 // CrobotQQclientDlg 对话框
@@ -32,7 +38,25 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-    afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedBtnStart();
 	afx_msg void OnBnClickedBtnStop();
+    afx_msg void OnBnClickedBtnSelectFile();
+
+
+private:
+    CString m_filename;
+    CString m_fileext;//文件扩展名
+    CString m_filepathname;
+    CString m_fileFullPath;
+    CEdit mEditCtlPath;
+public:
+    afx_msg void OnBnClickedBtnHelp();
+
+
+private:
+    int mLastFileSize;
+    int mCurFileSize;
+
+    bool m_flagCheckFileSize;
+
 };

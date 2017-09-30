@@ -185,7 +185,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dataFile.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="robotQQclient.h" />
     <ClInclude Include="robotQQclientDlg.h" />
@@ -194,7 +193,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dataFile.cpp" />
     <ClCompile Include="robotQQclient.cpp" />
     <ClCompile Include="robotQQclientDlg.cpp" />
     <ClCompile Include="socketClient.cpp" />
