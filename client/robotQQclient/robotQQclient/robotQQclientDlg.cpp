@@ -6,7 +6,7 @@
 #include "robotQQclient.h"
 #include "robotQQclientDlg.h"
 #include "afxdialogex.h"
-
+#include "socketClient.h"
 
 
 #ifdef _DEBUG
@@ -14,19 +14,37 @@
 #endif
 
 
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+#define  READ_EACH_TIME_MAX_DATA  2048 
+
 bool gFlagCheckFileSize = FLAGE_STOP_THREAD_PROC;
 bool gOnOffSound = 0;
-unsigned long long gCurrentFileSize;   // 当前的文件大小
-unsigned long long gLastFileSize;        // 上次的文件大小
+unsigned long long gCurrentFileSize = 0;   //  当前的文件大小
+unsigned long long gLastFileSize = 0;        //  上次的文件大小
+unsigned long long gFileSeekPoint = 0;      // 当前文件数据读取的起点
+CString gLogFilePath;                               //  QQ日志文件的路径
 
+char gTcpServerAddr[32] = {"23.245.202.74"};
+unsigned short gTcpServerPort = 9876;
 
 DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
 {
+    HWND hMainDlg = AfxGetApp()->GetMainWnd()->GetSafeHwnd();
+    HWND hSysInfo = ::GetDlgItem(hMainDlg, IDC_SYS_INFO);
+
     while (1)
     {
         if (FLAGE_STOP_THREAD_PROC == gFlagCheckFileSize)
         {
+#if 1
             Sleep(5);
+#else
+            Sleep(60);
+#endif
             continue;
         }
         else
@@ -35,19 +53,62 @@ DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
             {   
                 MessageBeep(MB_OK);
             }
-            
+                                    
             // 0: check file has been modify ....
-            // 1: read file 
-            // 2: send file to server.
-            // 3: 
+
+            CFile logMsgFile(gLogFilePath.GetBuffer(), CFile::modeRead);
+            gCurrentFileSize = logMsgFile.GetLength();
+
             int changeSize = (int)(gCurrentFileSize - gLastFileSize);
-            if(1)
-            //if (changeSize > 0)
+            if (changeSize > 0)
             {
                 //  程序信息
-                HWND hMainDlg = AfxGetApp()->GetMainWnd()->GetSafeHwnd();
-                HWND hSysInfo = ::GetDlgItem(hMainDlg, IDC_SYS_INFO);
-                ::SetWindowTextW(hSysInfo, _T("1231"));
+                CString sysInfo;
+                sysInfo.Format(_T("检测到新的数据!  new:%d > old:%d."), gCurrentFileSize, gLastFileSize);
+                ::SetWindowTextW(hSysInfo, sysInfo );
+
+                // 1: read file 
+                char readBuf[READ_EACH_TIME_MAX_DATA] = { 0 };
+                logMsgFile.Seek(gLastFileSize, 0);
+                int readOKCount = logMsgFile.Read(readBuf, READ_EACH_TIME_MAX_DATA);
+                if (readOKCount)
+                {
+                    sysInfo.Format(_T("读取数据成功!  数据大小:%d."), readOKCount);
+                    ::SetWindowTextW(hSysInfo, sysInfo);
+                    gLastFileSize += readOKCount;
+
+                }
+                else
+                {
+                    sysInfo.Format(_T("读取数据失败."));
+                    ::SetWindowTextW(hSysInfo, sysInfo);
+                }
+
+
+                // 2: connect to sever.
+                socketClient tcpClient;
+                if (0 == tcpClient.initSocketForClient(gTcpServerAddr, gTcpServerPort))
+                {
+                    sysInfo.Format(_T("连接服务器成功."));
+                    ::SetWindowTextW(hSysInfo, sysInfo);
+                }
+                else
+                {
+                    sysInfo.Format(_T("连接服务器失败."));
+                    ::SetWindowTextW(hSysInfo, sysInfo);
+                }
+
+                // 3: send file to server.
+                if ( 0 < tcpClient.sendDataToServer(readBuf, readOKCount))
+                {
+                    sysInfo.Format(_T("发送数据成功."));
+                    ::SetWindowTextW(hSysInfo, sysInfo);
+                }
+                else
+                {
+                    sysInfo.Format(_T("发送数据失败."));
+                    ::SetWindowTextW(hSysInfo, sysInfo);
+                }
             }
             else
             {
@@ -100,7 +161,7 @@ END_MESSAGE_MAP()
 CrobotQQclientDlg::CrobotQQclientDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_ROBOTQQCLIENT_DIALOG, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIcon(IDB_MAINICON);
 }
 
 void CrobotQQclientDlg::DoDataExchange(CDataExchange* pDX)
@@ -246,8 +307,10 @@ void CrobotQQclientDlg::OnBnClickedBtnSelectFile()
         m_filepathname = fpdlg.GetPathName();
         //UpdateData(FALSE);
         //m_fileFullPath = m_filepathname + m_filename + "." + m_fileext;
-        //
-        mEditCtlPath.SetWindowTextW(m_filepathname);
+        
+        gLogFilePath = m_filepathname;
+
+        mEditCtlPath.SetWindowTextW(gLogFilePath);
     }
 }
 
@@ -255,9 +318,6 @@ void CrobotQQclientDlg::OnBnClickedBtnSelectFile()
 void CrobotQQclientDlg::OnBnClickedBtnHelp()
 {
     // TODO: 在此添加控件通知处理程序代码
-
-    CFile logMsgFile(m_filepathname.GetBuffer(), CFile::modeRead);
-    gCurrentFileSize = logMsgFile.GetLength();
 
     AfxMessageBox( _T("~~~点了也没啥卵用~~~") );
 }

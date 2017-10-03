@@ -51,8 +51,6 @@ int socketClient::initSocketForClient( const char  *serverIP, const int serverPo
 
     socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (0 == socketFD)
-
-
     {
         //error
         return -1;
@@ -77,7 +75,7 @@ int socketClient::initSocketForClient( const char  *serverIP, const int serverPo
         if (error_no < 0)
         {
             //printf("connect %s server_ip error, retry: %s(errno: %d)\n", server_ip, strerror(error_no), error_no);
-            //sleep(3);
+            Sleep(1);
             continue;
         }
         //printf("connect %s sucess!!!!.%s(errno: %d)\n", server_ip, strerror(error_no), error_no);

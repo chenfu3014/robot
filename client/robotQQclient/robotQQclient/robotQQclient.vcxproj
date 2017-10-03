@@ -210,6 +210,7 @@
     <None Include="res\robotQQclient.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="C:\Users\Administrator\Desktop\timg.bmp" />
     <Image Include="res\robotQQclient.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

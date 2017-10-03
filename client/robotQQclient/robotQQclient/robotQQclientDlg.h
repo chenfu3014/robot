@@ -6,7 +6,6 @@
 #include "afxwin.h"
 
 
-
 #define FLAGE_START_THREAD_PROC   1
 #define FLAGE_STOP_THREAD_PROC   0
 
