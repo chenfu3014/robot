@@ -21,14 +21,18 @@
 **************************************************************************/
 #define VERSION_INFO   2017-08/22-12:30
 
-
+#include <stdio.h>
 #include "netComm.h"
 #include "stroeData.h"
 
-void main()
+
+// g++ main.cpp hello.cpp netComm.cpp stroeData.cpp -o robotQQServer
+int main()
 {
+	printf("hello this is tony begin !!\r\n");
     createTaskNetCommService();
     createTaskStoreData();
+	printf("hello this is tony end !!!\r\n");
 }
 
 

@@ -1,0 +1,13 @@
+第一个是win2008的
+222.186.190.142 
+端口 52890
+administrator
+2uiPyAJmZv
+
+
+
+这是linux服务器:
+23.245.202.74 
+root
+AH@&823rfgk
+

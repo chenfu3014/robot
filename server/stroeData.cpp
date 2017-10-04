@@ -22,18 +22,28 @@
 
 
 
-#inlcude "stdio.h"
+#include "stdio.h"
 #include "string.h"
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/msg.h>
-#include <linux/tcp.h>
 #include <netdb.h>
 #include <errno.h>
 #include <net/if.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <pthread.h>
 
+
+
+void *thr_fn(void *arg)
+{
+	printf("new thread:");
+	return ((void *)0);
+}
 
 
 
@@ -52,6 +62,7 @@
 int createTaskStoreData()
 {
     //
+    int ret;
     int errNum = 0;
     pthread_t writeXmlId;
     errNum = pthread_create(&writeXmlId, NULL, thr_fn, NULL);

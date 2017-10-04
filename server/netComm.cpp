@@ -265,7 +265,8 @@ void recvDataAndNewConnectionFromClient()
                         else  
                         {      
                             // recv_ret > 0
-                            printf(" [%s:%d]!!!!!!!!!! wo recv data from server on socketfd:%d, datasize:%d. !!!!!!!!!! \r\n", __FUNCTION__ , __LINE__, socketfd, recv_ret);                                                                                  
+                            printf(" [%s:%d]!!!!!!!!!! wo recv data from server on socketfd:%d, datasize:%d. !!!!!!!!!! \r\n", __FUNCTION__ , __LINE__, socketfd, recv_ret); 
+							
                             //sys_post_event_to_APP(EV_CFW_TCPIP_REV_DATA_IND, socketfd, recv_len, 0, 0, 0);                            
                             sleep(1); 
                         }  
@@ -345,7 +346,7 @@ int initAsTcpServerMode()
     }
     srvAdrrInfo.sin_family = AF_INET;
     srvAdrrInfo.sin_addr.s_addr = htonl(INADDR_ANY);
-    srvAdrrInfo.sin_port = htons(10000);
+    srvAdrrInfo.sin_port = htons(9876);
     iRet = bind(serverListenFD, (struct sockaddr *)&srvAdrrInfo, sizeof(srvAdrrInfo));
     if( 0 != iRet )
     {
@@ -380,7 +381,7 @@ int initAsTcpServerMode()
   * @date               : 
  * @others             :
  ***************************************************************/
-void netCommThreadProc()
+ void *netCommThreadProc(void *arg)
 {
     recvDataAndNewConnectionFromClient();
 }
@@ -414,7 +415,7 @@ int createTaskNetCommService()
     } 
 
     
-    errNum = pthread_create(&threadNetCommID, NULL, (void *)netCommThreadProc, NULL);
+    errNum = pthread_create(&threadNetCommID, NULL, netCommThreadProc, NULL);
     if (errNum != 0)
     {
         printf("createTaskNetCommService failed: %s.\n", strerror(errNum));
