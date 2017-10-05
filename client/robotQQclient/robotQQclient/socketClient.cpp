@@ -23,14 +23,14 @@ socketClient::~socketClient()
 
 void socketClient::initResoure()
 {
-    socketFD = 0;
+    msocketFd = 0;
 }
 
 
 
 void socketClient::deinitResoure()
 {
-    socketFD = 0;
+    msocketFd = 0;
 }
 
 
@@ -49,8 +49,8 @@ int socketClient::initSocketForClient( const char  *serverIP, const int serverPo
         return -1;
     }
 
-    socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    if (0 == socketFD)
+    msocketFd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+    if (0 == msocketFd)
     {
         //error
         return -1;
@@ -71,7 +71,7 @@ int socketClient::initSocketForClient( const char  *serverIP, const int serverPo
     printf("[%s]%s:%d.\r\n", __FILE__, __FUNCTION__, __LINE__);
     while (1)
     {
-        error_no = connect(socketFD, (struct sockaddr*)&servAddrInfo, sizeof(servAddrInfo));
+        error_no = connect(msocketFd, (struct sockaddr*)&servAddrInfo, sizeof(servAddrInfo));
         if (error_no < 0)
         {
             //printf("connect %s server_ip error, retry: %s(errno: %d)\n", server_ip, strerror(error_no), error_no);
@@ -95,13 +95,19 @@ int socketClient::sendDataToServer(const char *sendBuf, const int bufSize)
     }
     while (sendLen < bufSize)
     {
-        int i = send(socketFD, sendBuf, bufSize, 0);
+        int i = send(msocketFd, sendBuf, bufSize, 0);
         if (0 > i)
         {
             return -1;
         }
-        sendBuf = sendBuf + i;
+        sendLen = sendLen + i;
     }
 
     return sendLen;
+}
+
+int socketClient::deinitSocketForClient()
+{
+    closesocket(msocketFd);
+    return 0;
 }

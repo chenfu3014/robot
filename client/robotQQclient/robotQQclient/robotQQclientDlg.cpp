@@ -28,20 +28,20 @@ unsigned long long gLastFileSize = 0;        //  上次的文件大小
 unsigned long long gFileSeekPoint = 0;      // 当前文件数据读取的起点
 CString gLogFilePath;                               //  QQ日志文件的路径
 
-char gTcpServerAddr[32] = {"23.245.202.74"};
-unsigned short gTcpServerPort = 9876;
+char gTcpServerAddr[32] = {"0"};
+unsigned short gTcpServerPort = 54321;
 
 DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
 {
     HWND hMainDlg = AfxGetApp()->GetMainWnd()->GetSafeHwnd();
     HWND hSysInfo = ::GetDlgItem(hMainDlg, IDC_SYS_INFO);
-
+    CString sysInfo;
     while (1)
     {
         if (FLAGE_STOP_THREAD_PROC == gFlagCheckFileSize)
         {
 #if 1
-            Sleep(5);
+            Sleep(5 * 1000);
 #else
             Sleep(60);
 #endif
@@ -55,17 +55,16 @@ DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
             }
                                     
             // 0: check file has been modify ....
-
             CFile logMsgFile(gLogFilePath.GetBuffer(), CFile::modeRead);
             gCurrentFileSize = logMsgFile.GetLength();
 
             int changeSize = (int)(gCurrentFileSize - gLastFileSize);
             if (changeSize > 0)
             {
-                //  程序信息
-                CString sysInfo;
+                //  程序信息                
                 sysInfo.Format(_T("检测到新的数据!  new:%d > old:%d."), gCurrentFileSize, gLastFileSize);
-                ::SetWindowTextW(hSysInfo, sysInfo );
+                ::SetWindowTextW(hSysInfo, sysInfo);
+                Sleep(1 * 1000);
 
                 // 1: read file 
                 char readBuf[READ_EACH_TIME_MAX_DATA] = { 0 };
@@ -84,6 +83,8 @@ DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
                     ::SetWindowTextW(hSysInfo, sysInfo);
                 }
 
+                // close file
+                logMsgFile.Close();
 
                 // 2: connect to sever.
                 socketClient tcpClient;
@@ -91,28 +92,39 @@ DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
                 {
                     sysInfo.Format(_T("连接服务器成功."));
                     ::SetWindowTextW(hSysInfo, sysInfo);
+                    Sleep(1 * 1000);
                 }
                 else
                 {
                     sysInfo.Format(_T("连接服务器失败."));
                     ::SetWindowTextW(hSysInfo, sysInfo);
+                    Sleep(1 * 1000);
                 }
 
                 // 3: send file to server.
+                //if (0 < tcpClient.sendDataToServer("1234567890", strlen("1234567890")))
                 if ( 0 < tcpClient.sendDataToServer(readBuf, readOKCount))
                 {
                     sysInfo.Format(_T("发送数据成功."));
                     ::SetWindowTextW(hSysInfo, sysInfo);
+                    Sleep(1 * 1000);
                 }
                 else
                 {
                     sysInfo.Format(_T("发送数据失败."));
                     ::SetWindowTextW(hSysInfo, sysInfo);
+                    Sleep(1 * 1000);
                 }
+
+                // 4: close tcp client.
+                Sleep(3 * 1000);
+                tcpClient.deinitSocketForClient();
             }
             else
             {
-                Sleep(5);
+                // close file
+                logMsgFile.Close();
+                Sleep(5 * 1000);
             }
         }
     }
@@ -154,14 +166,14 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CrobotQQclientDlg 对话框
+// CrobotQQclientDlg 对话框  服务器地址：
 
 
 
 CrobotQQclientDlg::CrobotQQclientDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_ROBOTQQCLIENT_DIALOG, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDB_MAINICON);
+	//m_hIcon = AfxGetApp()->LoadIcon(IDB_MAINICON);
 }
 
 void CrobotQQclientDlg::DoDataExchange(CDataExchange* pDX)
@@ -169,6 +181,7 @@ void CrobotQQclientDlg::DoDataExchange(CDataExchange* pDX)
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_EDIT_FILE_PATH, mEditCtlPath);
     DDX_Control(pDX, IDC_SYS_INFO, mCtrlSysInfo);
+    DDX_Control(pDX, IDC_IPADDR_SRV, mCtrlIPAdress);
 }
 
 BEGIN_MESSAGE_MAP(CrobotQQclientDlg, CDialogEx)
@@ -223,6 +236,8 @@ BOOL CrobotQQclientDlg::OnInitDialog()
     {
         AfxMessageBox( _T("Monitor Log File Failed!!!"));
     }
+
+    mCtrlIPAdress.SetWindowTextW(_T("192.168.64.128"));   // 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -283,8 +298,7 @@ void CrobotQQclientDlg::OnBnClickedBtnStart()
 	// TODO: 在此添加控件通知处理程序代码
 
     gFlagCheckFileSize = FLAGE_START_THREAD_PROC;
-    mCtrlSysInfo.SetWindowTextW( _T(" Start !!!"));
-
+    mCtrlSysInfo.SetWindowTextW( _T(" Start !!!"));    
 }
 
 
@@ -311,6 +325,18 @@ void CrobotQQclientDlg::OnBnClickedBtnSelectFile()
         gLogFilePath = m_filepathname;
 
         mEditCtlPath.SetWindowTextW(gLogFilePath);
+
+
+        CIPAddressCtrl * pIP = (CIPAddressCtrl*)GetDlgItem(IDC_IPADDR_SRV);
+        BYTE nf1, nf2, nf3, nf4;
+        pIP->GetAddress(nf1, nf2, nf3, nf4);
+        CString cstrServerAddr;
+        cstrServerAddr.Format(_T("%d.%d.%d.%d"), nf1, nf2, nf3, nf4);//这里的nf得到的值是IP值了
+
+        int strLength = cstrServerAddr.GetLength() + 1;
+        TCHAR bufIPAddr[32] = { _T("0") };
+        wcsncpy_s(bufIPAddr, (cstrServerAddr.GetBuffer()), strLength);
+        WideCharToMultiByte(CP_ACP, 0, bufIPAddr, wcslen(bufIPAddr), gTcpServerAddr, 32, NULL, NULL);
     }
 }
 

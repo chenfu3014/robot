@@ -4,6 +4,7 @@
 
 #pragma once
 #include "afxwin.h"
+#include "afxcmn.h"
 
 
 #define FLAGE_START_THREAD_PROC   1
@@ -60,4 +61,5 @@ private:
 public:
     afx_msg void OnBnClickedBtnOnoffSouned();
     CStatic mCtrlSysInfo;
+    CIPAddressCtrl mCtrlIPAdress;
 };
