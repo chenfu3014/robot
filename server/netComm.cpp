@@ -276,7 +276,7 @@ void recvDataAndNewConnectionFromClient()
                     else                        // socketfd for server listen .
                     {
                         int iRet = 0;
-                        int addr_len = sizeof(gAcceptNewSockaddInfo);
+                        socklen_t addr_len = sizeof(gAcceptNewSockaddInfo);
                         
                         iRet = accept(socketfd, (struct sockaddr*)&gAcceptNewSockaddInfo, &addr_len);
                         if( iRet > 0 )
