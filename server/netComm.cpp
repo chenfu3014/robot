@@ -240,10 +240,11 @@ void recvDataAndNewConnectionFromClient()
                     continue;  
                 }
                 socketfd=monitorSocketIdArray[i];  
-                printf("===>i:%d, socketfd:%d, select_ret:%d.\r\n", i, monitorSocketIdArray[i], select_ret);
+                printf("===>i:%d, socketfd:%d, select_ret:%d, gServerListentSocketID:%d.\r\n", i, monitorSocketIdArray[i], select_ret, gServerListentSocketID);
                 
                 if ( FD_ISSET(socketfd,&fdread))  
                 {  
+                    printf("FD_ISSET socketfd:%d has event.\n", socketfd );
                     if( socketfd != gServerListentSocketID )                           // socketfd not for accept new connection......
                     {
                         char recv_buf[MAX_READ_BUF] = {0};
@@ -254,6 +255,7 @@ void recvDataAndNewConnectionFromClient()
                             //
                             printf("[%s:%d] tcp connection is error...., socketfd:%d,recv_ret:%d.\r\n", __FUNCTION__ , __LINE__,socketfd, recv_ret);                         
                             deleteSocketIdFromMonitorArray(socketfd);
+                            close(socketfd);
                             //sys_post_event_to_APP(EV_CFW_TCPIP_ERR_IND, socket, 0, 0, 0, 0);
                         }                      
                         else if (0 == recv_ret)
@@ -261,6 +263,7 @@ void recvDataAndNewConnectionFromClient()
                             // there is 2 situation. 1: remote pc close the socket; 2: network is broken....
                             printf("[%s:%d] tcp connection is close.... socketfd:%d, recv_ret:%d.\r\n", __FUNCTION__ , __LINE__,socketfd, recv_ret);
                             deleteSocketIdFromMonitorArray(socketfd); //must be delete for ftp.....
+                            close(socketfd);
                             //sys_post_event_to_APP(EV_CFW_TCPIP_CLOSE_IND, socketfd, 0, 0, 0, 0);    
                             //FD_CLR();
                         }
@@ -270,7 +273,13 @@ void recvDataAndNewConnectionFromClient()
                             printf(" [%s:%d]!!!!!!!!!! wo recv data from server on socketfd:%d, datasize:%d. !!!!!!!!!! \r\n", __FUNCTION__ , __LINE__, socketfd, recv_ret); 
 							
                             //sys_post_event_to_APP(EV_CFW_TCPIP_REV_DATA_IND, socketfd, recv_len, 0, 0, 0);                            
-                            sleep(1); 
+                            sleep(1);
+                            printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \r\n"); 
+                            recv_ret=recv(socketfd,recv_buf,recv_buf_size, 0);  
+                            printf("==>len:%d.buf:\r\n%s. \r\n", recv_ret, recv_buf);                             
+                            printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \r\n"); 
+                            
+                            
                         }  
                     }
                     else                        // socketfd for server listen .
@@ -282,7 +291,7 @@ void recvDataAndNewConnectionFromClient()
                         if( iRet > 0 )
                         {      
                             printf("BAL_CFWApsTask accept sin_port(new):%d, DestIP(new):%s. \r\n", ntohs(gAcceptNewSockaddInfo.sin_port), inet_ntoa(gAcceptNewSockaddInfo.sin_addr)); 
-                            printf("!!!!!!!!!!BAL_CFWApsTask new client incomming new socketfd:%d .!!!!!!!!! \r\n", iRet); 
+                            printf("!!!!!!!!!! new client incomming new socketfd:%d .!!!!!!!!! \r\n", iRet); 
                             insertSocketIdToMonitorArray(iRet);                            
                                     
                             //sys_post_event_to_APP(EV_CFW_TCPIP_ACCEPT_IND, socketfd, 0, 0, 0, 0);
@@ -349,7 +358,7 @@ int initAsTcpServerMode()
 	printf("!!!!!!!!!!initServerSocket serverListenFD %d.!!!!!!!!! \r\n", serverListenFD); 
     srvAdrrInfo.sin_family = AF_INET;
     srvAdrrInfo.sin_addr.s_addr = htonl(INADDR_ANY);
-    srvAdrrInfo.sin_port = htons(9876);
+    srvAdrrInfo.sin_port = htons(54321);
     iRet = bind(serverListenFD, (struct sockaddr *)&srvAdrrInfo, sizeof(srvAdrrInfo));
     if( 0 != iRet )
     {
@@ -367,9 +376,10 @@ int initAsTcpServerMode()
         serverListenFD = -1;
         return RETURN_TCP_FAILED;
     }
-	printf("!!!!!!!!!!initServerSocket listen success.!!!!!!!!! \r\n");
+	printf("!!!!!!!!!!initServerSocket listen 54321 success.!!!!!!!!! \r\n");
 	
     insertSocketIdToMonitorArray( serverListenFD );
+    setServerListenSocketID(serverListenFD);
     return RETURN_TCP_SUCCESS;
 }
 
