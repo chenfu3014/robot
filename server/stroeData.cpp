@@ -39,9 +39,14 @@
 
 
 
-void *thr_fn(void *arg)
+void *stroeDataFunProc(void *arg)
 {
-	printf("new thread:");
+	printf("stroeDataFunProc enter.\r\n");
+	while(1)
+	{
+		printf("stroeDataFunProc loop .....\r\n");
+		sleep(3);
+	}
 	return ((void *)0);
 }
 
@@ -65,7 +70,7 @@ int createTaskStoreData()
     int ret;
     int errNum = 0;
     pthread_t writeXmlId;
-    errNum = pthread_create(&writeXmlId, NULL, thr_fn, NULL);
+    errNum = pthread_create(&writeXmlId, NULL, stroeDataFunProc, NULL);
     if (errNum != 0)
     {
         printf("createTaskSaveXMLToLocal failed: %s\n", strerror(errNum));

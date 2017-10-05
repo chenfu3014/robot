@@ -205,16 +205,16 @@ void recvDataAndNewConnectionFromClient()
     int socketfd = 0; 
     
     struct timeval timeout;
-    printf("[%s:%d] enter. \r\n", __FUNCTION__ , __LINE__);
+    printf("recvDataAndNewConnectionFromClient enter. \r\n");
     
     while(1)  
     {              
         //must here......
         setSocketIdToFD(&fdread);
 
-        timeout.tv_sec= 2;
-        timeout.tv_usec= 0;
-        
+        timeout.tv_sec= 3;
+        timeout.tv_usec= 0;		
+        printf("recvDataAndNewConnectionFromClient select waiting...\n");
         select_ret = select( maxSocketFD+1, &fdread, NULL, NULL, &timeout);
         
         if( 0 > select_ret )    //error
@@ -226,11 +226,13 @@ void recvDataAndNewConnectionFromClient()
         }
         if ( 0 == select_ret)   //select is timeout 
         {
+        	printf("recvDataAndNewConnectionFromClient select timeout.\n");
             continue;  
         }  
         else    // 0 < slelct_ret  
         {  
             int i = 0;
+			printf("recvDataAndNewConnectionFromClient select_ret > 0.\n");
             for (i;i<FD_SETSIZE;i++)  
             {   
                 if ( 0 == monitorSocketIdArray[i])  
@@ -344,6 +346,7 @@ int initAsTcpServerMode()
     {
         printf("!!!!!!!!!!initServerSocket socket failed.!!!!!!!!! \r\n");         
     }
+	printf("!!!!!!!!!!initServerSocket serverListenFD %d.!!!!!!!!! \r\n", serverListenFD); 
     srvAdrrInfo.sin_family = AF_INET;
     srvAdrrInfo.sin_addr.s_addr = htonl(INADDR_ANY);
     srvAdrrInfo.sin_port = htons(9876);
@@ -355,7 +358,7 @@ int initAsTcpServerMode()
         serverListenFD = -1;
         return RETURN_TCP_FAILED;
     }
-    
+    printf("!!!!!!!!!!initServerSocket bind success.!!!!!!!!! \r\n"); 
     iRet = listen(serverListenFD,10);
     if( 0 != iRet )
     {
@@ -364,7 +367,8 @@ int initAsTcpServerMode()
         serverListenFD = -1;
         return RETURN_TCP_FAILED;
     }
-
+	printf("!!!!!!!!!!initServerSocket listen success.!!!!!!!!! \r\n");
+	
     insertSocketIdToMonitorArray( serverListenFD );
     return RETURN_TCP_SUCCESS;
 }
@@ -383,6 +387,7 @@ int initAsTcpServerMode()
  ***************************************************************/
  void *netCommThreadProc(void *arg)
 {
+	printf("netCommThreadProc enter.\n");
     recvDataAndNewConnectionFromClient();
 }
 
