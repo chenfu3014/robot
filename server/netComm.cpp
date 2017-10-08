@@ -36,16 +36,21 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 
+
+
+
 #define RETURN_TCP_SUCCESS    0
 #define RETURN_TCP_FAILED    -1
+
 #define MAX_READ_BUF            2048
+extern int gIsRecvDataFlag;
+extern char gRecvBufStoreData[MAX_READ_BUF];
 
 
 int maxSocketFD = 0;                                // max socketid for select .
 int monitorSocketIdArray[FD_SETSIZE];  // tht socket is create by scket(), and use recv data for client and server.. and  accepct a new connection
 int gServerListentSocketID = 0;             //  the socket is used  for  judge whether is a new client connection.
 int gCurClientConnectCounts = 0;             // current clients numbers  connecting on server.
-
 
 struct sockaddr_in gAcceptNewSockaddInfo;
 
@@ -271,13 +276,22 @@ void recvDataAndNewConnectionFromClient()
                         {      
                             // recv_ret > 0
                             printf(" [%s:%d]!!!!!!!!!! wo recv data from server on socketfd:%d, datasize:%d. !!!!!!!!!! \r\n", __FUNCTION__ , __LINE__, socketfd, recv_ret); 
-							
+						
                             //sys_post_event_to_APP(EV_CFW_TCPIP_REV_DATA_IND, socketfd, recv_len, 0, 0, 0);                            
                             sleep(1);
                             printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \r\n"); 
                             recv_ret=recv(socketfd,recv_buf,recv_buf_size, 0);  
-                            printf("==>len:%d.buf:\r\n%s. \r\n", recv_ret, recv_buf);                             
+                            if( 0 < recv_ret )
+                            {
+                                printf("==>len:%d.buf:\r\n%s. \r\n", recv_ret, recv_buf);      
+                                memcpy( gRecvBufStoreData, recv_buf, recv_ret);
+                                gIsRecvDataFlag = 1;
+                                
+                            }
                             printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \r\n"); 
+
+
+							
                             
                             
                         }  
@@ -435,7 +449,10 @@ int createTaskNetCommService()
     {
         printf("createTaskNetCommService failed: %s.\n", strerror(errNum));
     }    
-    
+    else
+    {
+        printf("createTaskNetCommService successfully: %s.\n", strerror(errNum));
+    }
     return RETURN_TCP_SUCCESS; 
 }
 

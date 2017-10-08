@@ -27,12 +27,12 @@
 #include "stroeData.h"
 
 
-// g++ main.cpp netComm.cpp stroeData.cpp -o robotQQServer
+//g++ main.cpp netComm.cpp stroeData.cpp -o robotQQServer -lpthread
 int main()
 {
 	printf("hello this is tony begin !!\r\n");
-    createTaskNetCommService();
-    createTaskStoreData();
+        createTaskNetCommService();
+        createTaskStoreData();
 	while(1)
 	{
 		printf("main loop... !!!\r\n");

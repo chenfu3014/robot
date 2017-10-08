@@ -23,9 +23,6 @@
 #ifndef _SOCKET_SRV_H_H_
 #define _SOCKET_SRV_H_H_
 
-#define FD_SETSIZE 32
-
-
 
 /**
  **************************************************************
