@@ -14,7 +14,7 @@
 ** History:
 **Author (core ID)        Date          Number     Description of Changes
 
-**--------------------------------------------------------------------------------------------------------------------
+**----------------------------------------------------------- 仅供参考---------------------------------------------------------
 **                    --           --
 ** 
 ** --------------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@
 //g++ main.cpp netComm.cpp stroeData.cpp -o robotQQServer -lpthread
 int main()
 {
-	printf("hello this is tony begin !!\r\n");
+	printf("hello this is tony begin !!   仅供参考 \r\n");
         createTaskNetCommService();
         createTaskStoreData();
 	while(1)

@@ -36,6 +36,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <iconv.h>
+#include <stdlib.h>
+
+
 
 #define MAX_READ_BUF            10240
 #define MAX_PHP_STORE_DATA      20480
@@ -56,7 +60,43 @@ char gBufStop[] = {"¶Ô´íÎð¹Ö"};
 char gBufBreakLine[] = {"\r\n"};
 
 
+int saveToFile(  const char *dataBuf, int dataSize )
+{
+    //
+    iconv_t cd; 
+    cd = iconv_open("GBK","UTF8"); 
+    int utf8DataLen = 0;
+    char *utf8DataBuf = (char *)malloc(dataSize*2);
+    if( 0 == cd || NULL == utf8DataBuf )
+    {
+        return -1;
+    }
+    memset( utf8DataBuf, 0, dataSize *2 );
 
+    char **pin = (char **)&dataBuf;
+    char **pout = &utf8DataBuf;
+
+    if( -1 == iconv( cd, pin, (size_t*)&dataSize, pout, (size_t*)&utf8DataLen) )
+    {
+        return -1;
+    }
+    iconv_close(cd);
+    
+    
+    //
+    FILE *fp = NULL;
+    fp = fopen( "test.php", "a+");
+    if( NULL ==  fp )
+    {
+        return -1;
+    }
+
+    fwrite( utf8DataBuf, utf8DataLen, 1, fp );
+    //fflush(fp);
+    fclose(fp);
+    fp = NULL;
+    
+}
 
 
 /****************************************************************
@@ -111,7 +151,16 @@ void combineThePHPTrail()
 
 
 
-
+/****************************************************************
+* @function name	  : 
+* @brief			  : 
+ * @input param 	   : 
+* @output param 	  : 
+* @retval			  : 
+* @author			  : 
+ * @date			   : 
+* @others			  :
+***************************************************************/
 void combineThePHPAllData()
 {
     printf("combineThePHPAllData enter.\r\n");
@@ -125,7 +174,8 @@ void combineThePHPAllData()
     strcat(gPHPWriteData, gPHPDataTrail);
 
     printf("\r\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
-    printf("\r\n%s\r\n", gPHPWriteData);
+    //printf("\r\n%s\r\n", gPHPWriteData);
+    saveToFile( gPHPWriteData, strlen(gPHPWriteData) );
     printf("\r\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\r\n");
 }
 
@@ -466,7 +516,7 @@ void *stroeDataFunProc(void *arg)
 			
             printf("stroeDataFunProc no data.\r\n");
 			sleep(2);
-                        continue;
+            continue;
 		}
 		else
 		{
@@ -501,9 +551,9 @@ int createTaskStoreData()
 {
     //
     // for test.
-    combineThePHPHead();
-    combineThePHPTrail();
-    splitSegementData( (char *)"abc", strlen("abc"));
+    //combineThePHPHead();
+    //combineThePHPTrail();
+    //splitSegementData( (char *)"abc", strlen("abc"));
     //
     
     int ret;

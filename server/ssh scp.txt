@@ -2,6 +2,6 @@ scp ./robotQQServer  root@23.245.202.74:/root/src/tony/robot/
 AH@&823rfgk
 
 
-
-ssh root@23.245.202.74
 AH@&823rfgk
+ssh root@23.245.202.74
+

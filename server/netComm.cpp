@@ -284,9 +284,11 @@ void recvDataAndNewConnectionFromClient()
                             if( 0 < recv_ret )
                             {
                                 printf("==>len:%d.buf:\r\n%s. \r\n", recv_ret, recv_buf);      
+                                #if 1
                                 memcpy( gRecvBufStoreData, recv_buf, recv_ret);
                                 gIsRecvDataFlag = 1;
-                                
+                                #else
+                                #endif
                             }
                             printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \r\n"); 
 
