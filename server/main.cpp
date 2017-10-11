@@ -31,7 +31,16 @@
 int main()
 {
 	printf("hello this is tony begin !!   ½ö¹©²Î¿¼ \r\n");
-        createTaskNetCommService();
+        while(1)
+        {
+            if( 0 == createTaskNetCommService() )
+            {
+                break;
+            }
+            sleep(3);
+            continue;
+        }
+
         createTaskStoreData();
 	while(1)
 	{

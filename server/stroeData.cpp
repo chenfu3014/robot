@@ -46,6 +46,7 @@
 
 
 char gRecvBufStoreData[MAX_READ_BUF] = {0};
+char gRecvBufStoreDataUTF8[MAX_READ_BUF] = {0};
 
 char gPHPWriteData[MAX_PHP_STORE_DATA] = {0};
 char gPHPDataHead[128] = {0};
@@ -57,32 +58,160 @@ int gIsRecvDataFlag = 0;
 
 char gBufStart[] = {"六码两期"};
 char gBufStop[] = {"对错勿怪"};
+char gBufStartUtf8[32] = {0};
+char gBufStopUtf8[32] = {0};
 char gBufBreakLine[] = {"\r\n"};
+char gBufBreakLineUtf8[16] = {0};
 
 
+/****************************************************************
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
+***************************************************************/
+void convertStartFlagToUtf8()
+{
+    char *pIn = gBufStart;
+    char *pOut = gBufStartUtf8;   
+    memset(gBufStartUtf8, 0, 32);
+    size_t iInLen = strlen(gBufStart);                                
+    size_t iOutLen = 32; 
+
+    iconv_t hIconv = iconv_open("UTF-8", "GBK");  
+    if( 0 == hIconv )
+    {   
+        printf("start-flag: iconv_open error.\n" );
+        return ;
+    }
+
+    printf("start-flag:iconv_open hIconv:%d,iInLen:%d.\n", hIconv, iInLen );
+    size_t iRet = iconv(hIconv, (&pIn), &iInLen, &pOut, &iOutLen); 
+    printf("start-flag:iconv iRet:%d.\n", iRet );
+    if( -1 != iRet )
+    {
+        printf("start-flag:iconv data successfull.len:%d,gBufStartUtf8:%s.\n", strlen(gBufStartUtf8), gBufStartUtf8);
+    }           
+    else
+    {
+        printf("start-flag:iconv data failed....\n");                                        
+    }
+    iconv_close(hIconv);    
+}
+
+
+
+
+
+
+/****************************************************************
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
+***************************************************************/
+void convertStopFlagToUtf8()
+{
+    char *pIn = gBufStop;
+    char *pOut = gBufStopUtf8;   
+    memset(gBufStopUtf8, 0, 32);
+    size_t iInLen = strlen(gBufStop);                                
+    size_t iOutLen = 32; 
+
+    iconv_t hIconv = iconv_open("UTF-8", "GBK");  
+    if( 0 == hIconv )
+    {   
+        printf("stop-flag: iconv_open error.\n" );
+        return ;
+    }
+
+    printf("stop-flag:iconv_open hIconv:%d,iInLen:%d.\n", hIconv, iInLen );
+    size_t iRet = iconv(hIconv, (&pIn), &iInLen, &pOut, &iOutLen); 
+    printf("stop-flag:iconv iRet:%d.\n", iRet );
+    if( -1 != iRet )
+    {
+        printf("stop-flag:iconv data successfull.len:%d, gBufStopUtf8:%s.\n", strlen(gBufStopUtf8),  gBufStopUtf8);
+    }           
+    else
+    {
+        printf("stop-flag:iconv data failed....\n");                                        
+    }
+    iconv_close(hIconv);    
+}
+
+
+
+
+
+/****************************************************************
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
+***************************************************************/
+void convertBreakLineToUtf8()
+{
+    #if 0
+    char *pIn = gBufBreakLine;
+    char *pOut = gBufBreakLineUtf8;   
+    memset(gBufBreakLineUtf8, 0, 16);
+    size_t iInLen = strlen(gBufBreakLine);                                
+    size_t iOutLen = 16; 
+
+    iconv_t hIconv = iconv_open("UTF-8", "GBK");  
+    if( 0 == hIconv )
+    {   
+        printf("breakline-flag: iconv_open error.\n" );
+        return ;
+    }
+
+    printf("breakline-flag:iconv_open hIconv:%d,iInLen:%d.\n", hIconv, iInLen );
+    size_t iRet = iconv(hIconv, (&pIn), &iInLen, &pOut, &iOutLen); 
+    printf("breakline-flag:iconv iRet:%d.\n", iRet );
+    if( -1 != iRet )
+    {
+        printf("breakline-flag:iconv data successfull.len:%d,gBufStartUtf8:%s.\n", strlen(gBufBreakLineUtf8), gBufBreakLineUtf8);
+    }           
+    else
+    {
+        printf("breakline-flag:iconv data failed....\n");                                        
+    }
+    iconv_close(hIconv);    
+    #else
+    memset(gBufBreakLineUtf8, 0, 16);
+    memcpy(gBufBreakLineUtf8, "\n", 1);
+    #endif
+}
+
+
+
+
+
+
+/****************************************************************
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
+***************************************************************/
 int saveToFile(  const char *dataBuf, int dataSize )
 {
-    //
-    iconv_t cd; 
-    cd = iconv_open("GBK","UTF8"); 
-    int utf8DataLen = 0;
-    char *utf8DataBuf = (char *)malloc(dataSize*2);
-    if( 0 == cd || NULL == utf8DataBuf )
-    {
-        return -1;
-    }
-    memset( utf8DataBuf, 0, dataSize *2 );
-
-    char **pin = (char **)&dataBuf;
-    char **pout = &utf8DataBuf;
-
-    if( -1 == iconv( cd, pin, (size_t*)&dataSize, pout, (size_t*)&utf8DataLen) )
-    {
-        return -1;
-    }
-    iconv_close(cd);
-    
-    
     //
     FILE *fp = NULL;
     fp = fopen( "test.php", "a+");
@@ -91,7 +220,7 @@ int saveToFile(  const char *dataBuf, int dataSize )
         return -1;
     }
 
-    fwrite( utf8DataBuf, utf8DataLen, 1, fp );
+    fwrite( dataBuf, dataSize, 1, fp );
     //fflush(fp);
     fclose(fp);
     fp = NULL;
@@ -100,14 +229,14 @@ int saveToFile(  const char *dataBuf, int dataSize )
 
 
 /****************************************************************
-* @function name	  : 
-* @brief			  : 
- * @input param 	   : 
-* @output param 	  : 
-* @retval			  : 
-* @author			  : 
- * @date			   : 
-* @others			  :
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
 ***************************************************************/
 void combineThePHPHead()
 {
@@ -128,14 +257,14 @@ void combineThePHPHead()
 
 
 /****************************************************************
-* @function name	  : 
-* @brief			  : 
- * @input param 	   : 
-* @output param 	  : 
-* @retval			  : 
-* @author			  : 
- * @date			   : 
-* @others			  :
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
 ***************************************************************/
 void combineThePHPTrail()
 {
@@ -152,14 +281,14 @@ void combineThePHPTrail()
 
 
 /****************************************************************
-* @function name	  : 
-* @brief			  : 
- * @input param 	   : 
-* @output param 	  : 
-* @retval			  : 
-* @author			  : 
- * @date			   : 
-* @others			  :
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
 ***************************************************************/
 void combineThePHPAllData()
 {
@@ -182,14 +311,14 @@ void combineThePHPAllData()
 
 
 /****************************************************************
-* @function name	  : 
-* @brief			  : 
- * @input param 	   : 
-* @output param 	  : 
-* @retval			  : 
-* @author			  : 
- * @date			   : 
-* @others			  :
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
 ***************************************************************/
 int formatEachLineDataToBuf( const char *eachLineBuf, int eachLineLen )
 {
@@ -197,7 +326,7 @@ int formatEachLineDataToBuf( const char *eachLineBuf, int eachLineLen )
     char eachPHPLine[64] = {0};   //   echo '125-126期 3-8名【04】 挂(2)<br>';
     char eachDataLine[64] = {0};   //  125-126期 3-8名【04】 挂(2)
     memcpy( eachDataLine, eachLineBuf, eachLineLen );
-	printf("eachDataLine(%d)==>>\r\n%s\r\n<<==\r\n", eachLineLen, eachDataLine);
+    printf("eachDataLine(%d)==>>\r\n%s\r\n<<==\r\n", eachLineLen, eachDataLine);
 
 
     // combine body data.
@@ -207,7 +336,7 @@ int formatEachLineDataToBuf( const char *eachLineBuf, int eachLineLen )
     int phpLen = (int)strlen(eachPHPLine);
     printf("eachPHPLine(%d)==>>\r\n%s\r\n<<==\r\n", phpLen, eachPHPLine);
     strcat(gPHPDataBody, eachPHPLine);
-    strcat(gPHPDataBody, "\r\n");
+    strcat(gPHPDataBody, "\n");   //  linux is just \n
 
 
     printf("formatEachLineDataToBuf exit.\r\n");
@@ -228,40 +357,40 @@ int formatEachLineDataToBuf( const char *eachLineBuf, int eachLineLen )
 
 
 /****************************************************************
-* @function name	  : 
-* @brief			  : 
- * @input param 	   : 
-* @output param 	  : 
-* @retval			  : 
-* @author			  : 
- * @date			   : 
-* @others			  :
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
 #if 0
-					<!DOCTYPE html>
-					<html lang="en">
-					<head>
-					    <meta charset="UTF-8">
-					    <title>Title</title>
-					</head>
-					<body>
-					<?php
-						echo '六码两期<br>';
-						echo '------------------------------<br>';
-						echo '125-126期 3-8名【04】 挂(2)<br>';
-						echo '127-128期 3-8名【07】 中(1)<br>';
-						echo '128-129期 3-8名【01】 中(1)<br>';
-						echo '129-130期 3-8名【02】 中(1)<br>';
-						echo '130-131期 3-8名【02】 中(2)<br>';
-						echo '132-133期 3-8名【09】 中(1)<br>';
-						echo '133-134期 3-8名【02】 中(2)<br>';
-						echo '135-136期 3-8名【03】 中(1)<br>';
-						echo '136-137期 3-8名【06】 中(2)<br>';
-						echo '138-139期 3-8名【05】 等开(1)<br>';
-						echo '------------------------------<br>';
-						echo '仅供参考   对错勿怪<br>';
-					?>
-					</body>
-					</html>
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Title</title>
+                    </head>
+                    <body>
+                    <?php
+                        echo '六码两期<br>';
+                        echo '------------------------------<br>';
+                        echo '125-126期 3-8名【04】 挂(2)<br>';
+                        echo '127-128期 3-8名【07】 中(1)<br>';
+                        echo '128-129期 3-8名【01】 中(1)<br>';
+                        echo '129-130期 3-8名【02】 中(1)<br>';
+                        echo '130-131期 3-8名【02】 中(2)<br>';
+                        echo '132-133期 3-8名【09】 中(1)<br>';
+                        echo '133-134期 3-8名【02】 中(2)<br>';
+                        echo '135-136期 3-8名【03】 中(1)<br>';
+                        echo '136-137期 3-8名【06】 中(2)<br>';
+                        echo '138-139期 3-8名【05】 等开(1)<br>';
+                        echo '------------------------------<br>';
+                        echo '仅供参考   对错勿怪<br>';
+                    ?>
+                    </body>
+                    </html>
 #endif
 
 
@@ -275,24 +404,24 @@ int formatEachLineDataToBuf( const char *eachLineBuf, int eachLineLen )
 
 
 
-* @function name	  : 
-* @brief			  : 
- * @input param 	   : 
-* @output param 	  : 
-* @retval			  : 
-* @author			  : 
- * @date			   : 
-* @others			  :
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
 #if 0
-					<!DOCTYPE html>
-					<html lang="en">
-					<head>
-					    <meta charset="UTF-8">
-					    <title>Title</title>
-					</head>
-					<body>
-					<?php
-						echo '六码两期<br>
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Title</title>
+                    </head>
+                    <body>
+                    <?php
+                        echo '六码两期<br>
                               ------------------------------<br>
                               127-128期 3-8名【07】 中(1)<br>
                               128-129期 3-8名【01】 中(1)<br>
@@ -306,9 +435,9 @@ int formatEachLineDataToBuf( const char *eachLineBuf, int eachLineLen )
                               139-140期 3-8名【09】 等开(2)<br>
                               ------------------------------<br>
                               仅供参考   对错勿怪<br>';
-					?>
-					</body>
-					</html>
+                    ?>
+                    </body>
+                    </html>
 #endif
 
 ***************************************************************/
@@ -320,7 +449,7 @@ int formatEachRecordDataToBuf( const char *data, const int dataLen )
     }
     char eachRecordBuf[1024] = {"0"};
     memcpy( eachRecordBuf, data, dataLen );
-	printf("eachRecordData(%d)+++++++++>>>\r\n%s\r\n<<<+++++++++\r\n", dataLen, eachRecordBuf);
+    printf("eachRecordData(%d)\r\n+++++++++>>>\r\n%s\r\n<<<+++++++++\r\n", dataLen, eachRecordBuf);
 
     char *pStartPoint = NULL;
     char *pEndPoint = NULL;
@@ -328,22 +457,24 @@ int formatEachRecordDataToBuf( const char *data, const int dataLen )
     
     while( pCurPoint - eachRecordBuf <= dataLen)
     {
+        printf("formatEachRecordDataToBuf:(%d),(%d).\r\n", pCurPoint - eachRecordBuf , dataLen);
+        
         pStartPoint = pCurPoint;
-
-        pEndPoint = strstr( pCurPoint, gBufBreakLine );   // 指向   \r\n  中的  \r  .....
+        pEndPoint = strstr( pCurPoint, gBufBreakLineUtf8 );   // 指向   \r\n  中的  \r  .....       linux is just \n
         if( NULL == pEndPoint )
         {
-            return -1;
+            printf("formatEachRecordDataToBuf break.\r\n");
+            break;
         }
 
-        pCurPoint = pEndPoint + 2;    // 指向   \r\n  的下个字符  .....
+        pCurPoint = pEndPoint + 1;    // 指向   \r\n  的下个字符  .....          linux is just \n
 
         int eachLineDataLen = pEndPoint-pStartPoint;
         formatEachLineDataToBuf(pStartPoint,eachLineDataLen);  // data without \r\n
     }
 
     printf("formatEachRecordDataToBuf exit.\r\n");
-	return 0;
+    return 0;
 }
 
 
@@ -357,128 +488,89 @@ int formatEachRecordDataToBuf( const char *data, const int dataLen )
 
 
 /****************************************************************
-* @function name	  : 
-* @brief			  : 
- * @input param 	   : 
-* @output param 	  : 
-* @retval			  : 
-* @author			  : 
- * @date			   : 
-* @others			  :
-						2017-09-27 16:46:41 正在连接服务器：123.151.77.183
-						2017-09-27 16:46:46 成功连接到服务器
-						2017-09-27 16:46:46 下载QQ列表
-						2017-09-27 16:46:46 登陆成功!
-						2017-09-27 16:46:47 协议版本：QQ_8_9
-						2017-09-27 16:46:55 发送队列启动完成
-						2017-09-27 16:50:45 拖泥(2353617310) 说：    六码两期
-						六码两期
-						------------------------------
-						125-126期 3-8名【04】 挂(2)
-						127-128期 3-8名【07】 中(1)
-						128-129期 3-8名【01】 中(1)
-						129-130期 3-8名【02】 中(1)
-						130-131期 3-8名【02】 中(2)
-						132-133期 3-8名【09】 中(1)
-						133-134期 3-8名【02】 中(2)
-						135-136期 3-8名【03】 中(1)
-						136-137期 3-8名【06】 中(2)
-						138-139期 3-8名【05】 等开(1)
-						------------------------------
-						仅供参考   对错勿怪
-						六码两期
-						------------------------------
-						125-126期 3-8名【04】 挂(2)
-						127-128期 3-8名【07】 中(1)
-						128-129期 3-8名【01】 中(1)
-						129-130期 3-8名【02】 中(1)
-						130-131期 3-8名【02】 中(2)
-						132-133期 3-8名【09】 中(1)
-						133-134期 3-8名【02】 中(2)
-						135-136期 3-8名【03】 中(1)
-						136-137期 3-8名【06】 中(2)
-						138-139期 3-8名【05】 等开(1)
-						------------------------------
-						仅供参考   对错勿怪
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
+                        2017-09-27 16:46:41 正在连接服务器：123.151.77.183
+                        2017-09-27 16:46:46 成功连接到服务器
+                        2017-09-27 16:46:46 下载QQ列表
+                        2017-09-27 16:46:46 登陆成功!
+                        2017-09-27 16:46:47 协议版本：QQ_8_9
+                        2017-09-27 16:46:55 发送队列启动完成
+                        2017-09-27 16:50:45 拖泥(2353617310) 说：    六码两期
+                        六码两期
+                        ------------------------------
+                        125-126期 3-8名【04】 挂(2)
+                        127-128期 3-8名【07】 中(1)
+                        128-129期 3-8名【01】 中(1)
+                        129-130期 3-8名【02】 中(1)
+                        130-131期 3-8名【02】 中(2)
+                        132-133期 3-8名【09】 中(1)
+                        133-134期 3-8名【02】 中(2)
+                        135-136期 3-8名【03】 中(1)
+                        136-137期 3-8名【06】 中(2)
+                        138-139期 3-8名【05】 等开(1)
+                        ------------------------------
+                        仅供参考   对错勿怪
+                        六码两期
+                        ------------------------------
+                        125-126期 3-8名【04】 挂(2)
+                        127-128期 3-8名【07】 中(1)
+                        128-129期 3-8名【01】 中(1)
+                        129-130期 3-8名【02】 中(1)
+                        130-131期 3-8名【02】 中(2)
+                        132-133期 3-8名【09】 中(1)
+                        133-134期 3-8名【02】 中(2)
+                        135-136期 3-8名【03】 中(1)
+                        136-137期 3-8名【06】 中(2)
+                        138-139期 3-8名【05】 等开(1)
+                        ------------------------------
+                        仅供参考   对错勿怪
 ***************************************************************/
-
-char temp_test[MAX_READ_BUF] = {" 2017-09-27 16:46:41 正在连接服务器：123.151.77.183\r\n\
-2017-09-27 16:46:46 成功连接到服务器\r\n\
-2017-09-27 16:46:46 下载QQ列表\r\n\
-2017-09-27 16:46:46 登陆成功!\r\n\
-2017-09-27 16:46:47 协议版本：QQ_8_9\r\n\
-2017-09-27 16:46:55 发送队列启动完成\r\n\
-2017-09-27 16:50:45 拖泥(2353617310) 说：    六码两期\r\n\
-------------------------------\r\n\
-125-126期 3-8名【04】 挂(2)\r\n\
-127-128期 3-8名【07】 中(1)\r\n\
-128-129期 3-8名【01】 中(1)\r\n\
-129-130期 3-8名【02】 中(1)\r\n\
-130-131期 3-8名【02】 中(2)\r\n\
-132-133期 3-8名【09】 中(1)\r\n\
-133-134期 3-8名【02】 中(2)\r\n\
-135-136期 3-8名【03】 中(1)\r\n\
-136-137期 3-8名【06】 中(2)\r\n\
-138-139期 3-8名【05】 等开(1)\r\n\
-------------------------------\r\n\
-仅供参考   对错勿怪\r\n\
-六码两期\r\n\
-------------------------------\r\n\
-140-141期 3-8名【04】 挂(2)\r\n\
-142-143期 3-8名【07】 中(1)\r\n\
-144-145期 3-8名【01】 中(1)\r\n\
-146-147期 3-8名【02】 中(1)\r\n\
-148-149期 3-8名【02】 中(2)\r\n\
-150-151期 3-8名【09】 中(1)\r\n\
-152-153期 3-8名【02】 中(2)\r\n\
-154-155期 3-8名【03】 中(1)\r\n\
-156-157期 3-8名【06】 中(2)\r\n\
-158-159期 3-8名【05】 等开(1)\r\n\
-------------------------------\r\n\
-仅供参考   对错勿怪\r\n"};
 int splitSegementData( /*const*/ char *dataBuf, /*const*/ int dataLen )
-{
-    
-    // for test
-	dataBuf = temp_test;	// for test
-	dataLen = (int)strlen(dataBuf);
-    // for test
-
+{    
     printf("splitSegementData enter.\r\n");
-	if( NULL == dataBuf || 0 == dataLen )
-	{	
-		return -1;
-	}
-	char *pStartPoint = NULL;  // 指向   六码两期    的开始
-	char *pEndPoint = NULL;    // 指向    对错勿怪    的末尾 
-	char *pCurPoint = (char *)dataBuf;
+    if( NULL == dataBuf || 0 == dataLen )
+    {    
+        return -1;
+    }
+    char *pStartPoint = NULL;  // 指向   六码两期    的开始
+    char *pEndPoint = NULL;    // 指向    对错勿怪    的末尾 
+    char *pCurPoint = (char *)dataBuf;
     
-	while( pCurPoint-dataBuf < dataLen )
-	{	    
-	    printf("splitSegementData %d:%d.\r\n", pCurPoint-dataBuf, dataLen);
-		pStartPoint = strstr(pCurPoint, gBufStart);
-		if( NULL == pStartPoint )
-		{
-			break;
-		}
+    while( pCurPoint-dataBuf < dataLen )
+    {        
+        printf("splitSegementData %d:%d.\r\n", pCurPoint-dataBuf, dataLen);
+        pStartPoint = strstr(pCurPoint, gBufStartUtf8);
+        if( NULL == pStartPoint )
+        {
+            printf("splitSegementData pStartPoint is null, so break.\r\n");
+            break;
+        }
 
-		pEndPoint = strstr(pCurPoint, gBufStop);
-		if( NULL == pEndPoint )
-		{
-			break;
-		}	
+        pEndPoint = strstr(pCurPoint, gBufStopUtf8);
+        if( NULL == pEndPoint )
+        {
+            printf("splitSegementData pEndPoint is null, so break.\r\n");        
+            break;
+        }    
 
-        int eachDataLen = (pEndPoint + 10) - pStartPoint;           // modifiy from 8 to 10 bls include \r\n
-		formatEachRecordDataToBuf( pStartPoint, eachDataLen );
+        int eachDataLen = (pEndPoint + 14) - pStartPoint;           // modifiy from 8 to 10 bls include \r\n            4*3=12;   12+2=14
+        formatEachRecordDataToBuf( pStartPoint, eachDataLen );
         pCurPoint = pEndPoint;
-        pCurPoint = pCurPoint + 8;
-	}
-	
-	//
+        pCurPoint = pCurPoint + 12;   // 4 * 3
+    }
+    
+    //
     combineThePHPAllData();
     
-	printf("splitSegementData exit.\r\n");
-	return 0; // success.
+    printf("splitSegementData exit.\r\n");
+    return 0; // success.
 }
 
 
@@ -497,40 +589,38 @@ int splitSegementData( /*const*/ char *dataBuf, /*const*/ int dataLen )
 
 
 /****************************************************************
-* @function name	  : 
-* @brief			  : 
- * @input param 	   : 
-* @output param 	  : 
-* @retval			  : 
-* @author			  : 
- * @date			   : 
-* @others			  :
+* @function name      : 
+* @brief              : 
+ * @input param        : 
+* @output param       : 
+* @retval              : 
+* @author              : 
+ * @date               : 
+* @others              :
 ***************************************************************/
 void *stroeDataFunProc(void *arg)
 {
-	printf("stroeDataFunProc enter.\r\n");
-	while(1)
-	{
-		if( 0 == gIsRecvDataFlag )
-		{
-			
+    printf("stroeDataFunProc enter.\r\n");
+    while(1)
+    {
+        if( 0 == gIsRecvDataFlag )
+        {            
             printf("stroeDataFunProc no data.\r\n");
-			sleep(2);
+            sleep(2);
             continue;
-		}
-		else
-		{
-            printf("stroeDataFunProc get data!!!\r\n");
+        }
+        else
+        {
             printf("==>gRecvBufStoreData(%d):\r\n%s. \r\n", (int)strlen(gRecvBufStoreData),  gRecvBufStoreData );
-			splitSegementData(gRecvBufStoreData, (int)strlen(gRecvBufStoreData));	
-					
-		}
-		//clean gRecvBufStoreData
-		memset( gRecvBufStoreData, 0, MAX_READ_BUF );
+            splitSegementData(gRecvBufStoreData, (int)strlen(gRecvBufStoreData));                        
+        }
         
-		sleep(3);
-	}
-	return ((void *)0);
+        //clean gRecvBufStoreData and data flag.
+        memset( gRecvBufStoreData, 0, MAX_READ_BUF );   
+        gIsRecvDataFlag = 0;
+        sleep(3);
+    }
+    return ((void *)0);
 }
 
 
@@ -567,6 +657,9 @@ int createTaskStoreData()
     else
     {
         printf("createTaskSaveXMLToLocal successfully: %s\n", strerror(errNum));
+        convertStartFlagToUtf8();
+        convertStopFlagToUtf8();
+        convertBreakLineToUtf8();
     }
     return ret; 
 }

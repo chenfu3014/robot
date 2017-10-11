@@ -35,6 +35,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <iconv.h>
+#include <stdlib.h>
 
 
 
@@ -42,7 +44,7 @@
 #define RETURN_TCP_SUCCESS    0
 #define RETURN_TCP_FAILED    -1
 
-#define MAX_READ_BUF            2048
+#define MAX_READ_BUF            10240
 extern int gIsRecvDataFlag;
 extern char gRecvBufStoreData[MAX_READ_BUF];
 
@@ -279,22 +281,37 @@ void recvDataAndNewConnectionFromClient()
 						
                             //sys_post_event_to_APP(EV_CFW_TCPIP_REV_DATA_IND, socketfd, recv_len, 0, 0, 0);                            
                             sleep(1);
-                            printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \r\n"); 
+
                             recv_ret=recv(socketfd,recv_buf,recv_buf_size, 0);  
                             if( 0 < recv_ret )
                             {
-                                printf("==>len:%d.buf:\r\n%s. \r\n", recv_ret, recv_buf);      
-                                #if 1
-                                memcpy( gRecvBufStoreData, recv_buf, recv_ret);
-                                gIsRecvDataFlag = 1;
-                                #else
-                                #endif
-                            }
-                            printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \r\n"); 
+                                char *pIn = recv_buf;
+                                char *pOut = gRecvBufStoreData;   
+                                memset(gRecvBufStoreData, 0, MAX_READ_BUF);
+                                size_t iInLen = strlen(recv_buf);                                
+                                size_t iOutLen = MAX_READ_BUF; 
 
-
-							
-                            
+                                iconv_t hIconv = iconv_open("UTF-8", "GBK");  
+                                if( 0 == hIconv )
+                                {   
+                                    printf("iconv_open error.\n" );
+                                    return ;
+                                }
+                                
+                                printf("iconv_open hIconv:%d,iInLen:%d.\n", hIconv, iInLen );
+                                size_t iRet = iconv(hIconv, (&pIn), &iInLen, &pOut, &iOutLen); 
+                                printf("iconv iRet:%d.\n", iRet );
+                                if( -1 != iRet )
+                                {
+                                    gIsRecvDataFlag = 1;
+                                    printf("iconv data successfull....\n");
+                                }           
+                                else
+                                {
+                                    printf("iconv data failed....\n");                                        
+                                }
+                                iconv_close(hIconv);                                                                                                           
+                            }               
                             
                         }  
                     }
@@ -416,6 +433,9 @@ int initAsTcpServerMode()
 	printf("netCommThreadProc enter.\n");
     recvDataAndNewConnectionFromClient();
 }
+
+
+
 
 
 /****************************************************************
