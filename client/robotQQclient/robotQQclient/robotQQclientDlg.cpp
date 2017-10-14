@@ -19,7 +19,7 @@
 #define new DEBUG_NEW
 #endif
 
-#define  READ_EACH_TIME_MAX_DATA  2048 
+#define  READ_EACH_TIME_MAX_DATA  20480
 
 bool gFlagCheckFileSize = FLAGE_STOP_THREAD_PROC;
 bool gOnOffSound = 0;
@@ -49,12 +49,10 @@ DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
         }
         else
         {
-            if (gOnOffSound)
-            {   
-                MessageBeep(MB_OK);
-            }
-                                    
             // 0: check file has been modify ....
+            sysInfo.Format(_T("检测是否有新的数据???"));
+            ::SetWindowTextW(hSysInfo, sysInfo);
+            Sleep(1 * 1000);
             CFile logMsgFile(gLogFilePath.GetBuffer(), CFile::modeRead);
             gCurrentFileSize = logMsgFile.GetLength();
 
@@ -86,26 +84,34 @@ DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
                 // close file
                 logMsgFile.Close();
 
+
                 // 2: connect to sever.
                 socketClient tcpClient;
-                if (0 == tcpClient.initSocketForClient(gTcpServerAddr, gTcpServerPort))
+                while (1)
                 {
-                    sysInfo.Format(_T("连接服务器成功."));
+                    sysInfo.Format(_T("开始连接服务器...."));
                     ::SetWindowTextW(hSysInfo, sysInfo);
-                    Sleep(1 * 1000);
-                }
-                else
-                {
-                    sysInfo.Format(_T("连接服务器失败."));
-                    ::SetWindowTextW(hSysInfo, sysInfo);
-                    Sleep(1 * 1000);
+                    if (0 == tcpClient.initSocketForClient(gTcpServerAddr, gTcpServerPort))
+                    {
+                        sysInfo.Format(_T("连接服务器成功."));
+                        ::SetWindowTextW(hSysInfo, sysInfo);
+                        Sleep(1 * 1000);
+                        break;
+                    }
+                    else
+                    {
+                        sysInfo.Format(_T("连接服务器失败，10秒后重试 "));
+                        ::SetWindowTextW(hSysInfo, sysInfo);
+                        Sleep(10 * 1000);
+                        continue;
+                    }
                 }
 
+
                 // 3: send file to server.
-                //if (0 < tcpClient.sendDataToServer("1234567890", strlen("1234567890")))
                 if ( 0 < tcpClient.sendDataToServer(readBuf, readOKCount))
                 {
-                    sysInfo.Format(_T("发送数据成功."));
+                    sysInfo.Format(_T("发送数据成功, 数据大小:%d."), readOKCount);
                     ::SetWindowTextW(hSysInfo, sysInfo);
                     Sleep(1 * 1000);
                 }
@@ -124,7 +130,9 @@ DWORD WINAPI  ThreadProcCheckFileSize(LPVOID lpParam)
             {
                 // close file
                 logMsgFile.Close();
-                Sleep(5 * 1000);
+                sysInfo.Format(_T("没有检测到新的数据,10s后重试."));
+                ::SetWindowTextW(hSysInfo, sysInfo);
+                Sleep(10 * 1000);
             }
         }
     }
@@ -237,7 +245,7 @@ BOOL CrobotQQclientDlg::OnInitDialog()
         AfxMessageBox( _T("Monitor Log File Failed!!!"));
     }
 
-    mCtrlIPAdress.SetWindowTextW(_T("192.168.64.128"));   // 
+    mCtrlIPAdress.SetWindowTextW(_T("23.245.202.74"));   // 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -298,7 +306,7 @@ void CrobotQQclientDlg::OnBnClickedBtnStart()
 	// TODO: 在此添加控件通知处理程序代码
 
     gFlagCheckFileSize = FLAGE_START_THREAD_PROC;
-    mCtrlSysInfo.SetWindowTextW( _T(" Start !!!"));    
+    mCtrlSysInfo.SetWindowTextW( _T(" 程序开始运行...."));    
 }
 
 
@@ -306,7 +314,7 @@ void CrobotQQclientDlg::OnBnClickedBtnStop()
 {
 	// TODO: 在此添加控件通知处理程序代码
     gFlagCheckFileSize = FLAGE_STOP_THREAD_PROC;
-    mCtrlSysInfo.SetWindowTextW( _T(" Stop !!!"));
+    mCtrlSysInfo.SetWindowTextW( _T(" 程序停止运行 !!!"));
 }
 
 

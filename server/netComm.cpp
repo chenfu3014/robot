@@ -323,10 +323,8 @@ void recvDataAndNewConnectionFromClient()
                         iRet = accept(socketfd, (struct sockaddr*)&gAcceptNewSockaddInfo, &addr_len);
                         if( iRet > 0 )
                         {      
-                            printf("BAL_CFWApsTask accept sin_port(new):%d, DestIP(new):%s. \r\n", ntohs(gAcceptNewSockaddInfo.sin_port), inet_ntoa(gAcceptNewSockaddInfo.sin_addr)); 
                             printf("!!!!!!!!!! new client incomming new socketfd:%d .!!!!!!!!! \r\n", iRet); 
-                            insertSocketIdToMonitorArray(iRet);                            
-                                    
+                            insertSocketIdToMonitorArray(iRet);                                                                
                             //sys_post_event_to_APP(EV_CFW_TCPIP_ACCEPT_IND, socketfd, 0, 0, 0, 0);
 
                         }

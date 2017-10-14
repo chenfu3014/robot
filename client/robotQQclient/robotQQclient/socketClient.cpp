@@ -69,17 +69,14 @@ int socketClient::initSocketForClient( const char  *serverIP, const int serverPo
 
     //  connect server
     printf("[%s]%s:%d.\r\n", __FILE__, __FUNCTION__, __LINE__);
-    while (1)
+    //while (1)
     {
+        int retryTimes = 0;
         error_no = connect(msocketFd, (struct sockaddr*)&servAddrInfo, sizeof(servAddrInfo));
-        if (error_no < 0)
+        if ( 0 != error_no )
         {
-            //printf("connect %s server_ip error, retry: %s(errno: %d)\n", server_ip, strerror(error_no), error_no);
-            Sleep(1);
-            continue;
+                return -1;
         }
-        //printf("connect %s sucess!!!!.%s(errno: %d)\n", server_ip, strerror(error_no), error_no);
-        break;
     }
 	return 0;
 }
@@ -93,6 +90,7 @@ int socketClient::sendDataToServer(const char *sendBuf, const int bufSize)
     {
         return -1;
     }
+
     while (sendLen < bufSize)
     {
         int i = send(msocketFd, sendBuf, bufSize, 0);
